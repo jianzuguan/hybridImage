@@ -4,7 +4,7 @@ import org.openimaj.image.FImage;
 import org.openimaj.image.processor.SinglebandImageProcessor;
 
 public class MyConvolution implements SinglebandImageProcessor<Float, FImage> {
-    private float[][] template;
+    protected float[][] template;
 
     public MyConvolution(float[][] template) {
         // both dimensions are odd
@@ -19,10 +19,11 @@ public class MyConvolution implements SinglebandImageProcessor<Float, FImage> {
         // of your temporary buffer image to the image.
 
         FImage bufferImage = image.clone().fill(0);
+
         int templateHeight = template.length;
         int templateWidth = template[0].length;
-        int templateHeightMid = templateHeight/2;
-        int templateWidthMid = templateWidth/2;
+        int templateHeightMid = templateHeight/2+1;
+        int templateWidthMid = templateWidth/2+1;
 
         // from 0 to middle of template height will be black
         for (int row=templateHeightMid; row<image.height-templateHeightMid; row++) {
@@ -41,4 +42,5 @@ public class MyConvolution implements SinglebandImageProcessor<Float, FImage> {
 
         image.internalAssign(bufferImage);
     }
+
 }

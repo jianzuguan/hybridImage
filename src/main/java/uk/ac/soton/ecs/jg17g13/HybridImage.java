@@ -1,22 +1,17 @@
 package uk.ac.soton.ecs.jg17g13;
 
-
-import org.openimaj.image.FImage;
 import org.openimaj.image.ImageUtilities;
 import org.openimaj.image.MBFImage;
-import org.openimaj.image.processing.convolution.Gaussian2D;
 import org.openimaj.image.processing.resize.BilinearInterpolation;
 
 import java.io.File;
 import java.io.IOException;
 
 public class HybridImage {
-    float sigma;
     MyConvolution conv;
 
-    public HybridImage(float sigma) {
-        this.sigma = sigma;
-        this.conv = getConv(sigma);
+    public HybridImage(MyConvolution conv) {
+        this.conv = conv;
     }
 
     public MBFImage getLowPassImage(String path) {
@@ -24,32 +19,6 @@ public class HybridImage {
         try {
             img = ImageUtilities.readMBF(new File(path));
             img = img.process(conv);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return img;
-    }
-
-    public MBFImage getMultiLowPassImage(String path) {
-        MBFImage img = null;
-        try {
-            img = ImageUtilities.readMBF(new File(path));
-
-/*
-            for(int i=1; i<=sigma; i++) {
-                conv = getConv(i);
-                img = img.process(conv);
-            }
-
-            conv = getConv(sigma);
-            img = img.process(conv);
-*/
-            int step = 5;
-            for(int i=0; i<step; i++) {
-                this.conv = getConv(sigma/step);
-                img = img.process(conv);
-            }
-
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -66,6 +35,9 @@ public class HybridImage {
             imgHPF = imgLPF.clone();
             // create lowpass filtered image
             imgLPF =imgLPF.process(conv);
+
+            System.out.print(imgLPF.getWidth()+"\t"+imgLPF.getHeight()+"\t"+imgHPF.getWidth()+"\t"+imgHPF.getHeight());
+
             // original iamge - lowpass image
             imgHPF = imgHPF.subtract(imgLPF);
         } catch (IOException e) {
@@ -121,16 +93,5 @@ public class HybridImage {
         return allSizeImg;
     }
 
-    private int getSize(float sigma) {
-        // (this implies the window is +/- 4 sigmas from the centre of the Gaussian)
-        int size = (int) (8.0f * sigma + 1.0f);
-        // size must be odd
-        if (size % 2 == 0) size++;
-        return size;
-    }
 
-    private MyConvolution getConv(float sigma) {
-        FImage template = Gaussian2D.createKernelImage(getSize(sigma), sigma);
-        return new MyConvolution(template.pixels);
-    }
 }

@@ -1,12 +1,9 @@
-
 package uk.ac.soton.ecs.jg17g13;
 
 import org.openimaj.image.DisplayUtilities;
 import org.openimaj.image.MBFImage;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-
 
 public class App {
     public static void main( String[] args ) {
@@ -22,7 +19,12 @@ public class App {
         paths.put("fish", "data/fish.bmp");
         paths.put("submarine", "data/submarine.bmp");
 
-        HybridImage hi = new HybridImage(5f);
+        MyConvolution myCon = new MyConvolution(Helper.getTemplate(5f).pixels);
+        FullImageConvolution fiCon = new FullImageConvolution(Helper.getTemplate(5f).pixels);
+
+        HybridImage hi;
+//        hi = new HybridImage(myCon);
+        hi = new HybridImage(fiCon);
 
         MBFImage imgDog = hi.getLowPassImage(paths.get("dog"));
         DisplayUtilities.display(imgDog);
@@ -38,7 +40,7 @@ public class App {
 */
 
         MBFImage hybridImg = hi.getHybridImage(paths.get("dog"), paths.get("cat"));
-//        DisplayUtilities.display(hybridImg);
+        DisplayUtilities.display(hybridImg);
 
 /*
         System.out.print("processing all size...");
